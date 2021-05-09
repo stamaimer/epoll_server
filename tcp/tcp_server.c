@@ -39,7 +39,7 @@ int main(int argc, char **argv)
         return -3;
     }
 
-    // 3. 
+    // 3. SO_REUSEADDR
     if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) == -1)
     {
         perror("setsockopt");
@@ -81,7 +81,14 @@ int main(int argc, char **argv)
         {
             // 7. recv
             memset(buf, 0, sizeof(buf));
-            if ((num = recv(acceptfd, buf, sizeof(buf), 0)) == -1)
+            num = recv(acceptfd, buf, sizeof(buf), 0);
+            if (num == -1)
+            {
+                perror("recv");
+                close(acceptfd);
+                return -8;
+            }
+            else if (num == 0)
             {
                 perror("recv");
                 close(acceptfd);
@@ -100,7 +107,8 @@ int main(int argc, char **argv)
 
             fprintf(stdout, "(socket: %d)send[%d]: %s", acceptfd, num, buf);
 
-            if (strncmp(buf, "quit", strlen("quit")) == 0) {
+            if (strncmp(buf, "quit", strlen("quit")) == 0)
+            {
                 fprintf(stdout, "server quit\n");
                 break;
             }
