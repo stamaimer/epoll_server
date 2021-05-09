@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
     fprintf(stdout, "connection to %s:%d\n", argv[1], atoi(argv[2]));
 
-    int sockfd, i;
+    int sockfd;
     struct sockaddr_in addr;
     char buf[1024];
     ssize_t num;
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     fd_set readmask;
     fd_set allreads;
     FD_ZERO(&allreads);
-    FD_SET(STDIN_FILENO, &allreads);
+    FD_SET(0, &allreads);  // 标准输入
 
     // 1. init server_addr
     memset(&addr, 0, sizeof(addr));
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
         }
 
         // 6. send
-        if (FD_ISSET(STDIN_FILENO, &readmask))
+        if (FD_ISSET(0, &readmask))
         {
             memset(buf, 0, sizeof(buf));
             if (fgets(buf, sizeof(buf), stdin) != NULL)
